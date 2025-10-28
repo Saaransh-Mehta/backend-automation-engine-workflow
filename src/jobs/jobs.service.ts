@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { connect } from 'http2';
 
 
 const prisma = new PrismaClient()
 
 @Injectable()
 export class JobsService {
-    async createJob(title:string,description:string,userId:number){
+    async createJob(title:string,description:string,userId:number,dependOn?:number){
         if(!title || !description || !userId){
             throw new Error("Missing Required Necessary Fields")
         }
@@ -16,6 +17,9 @@ export class JobsService {
                 description,
                 user:{
                     connect:{id:userId}
+                },
+                dependsOn:{
+                    connect: dependOn ? {id:dependOn} : undefined
                 }
             }
         })
@@ -53,5 +57,22 @@ export class JobsService {
         return job
     }
 
+
+    async deleteJob(jobId:number){
+        const exisitnJob = await prisma.job.findUnique({
+            where:{id:jobId}
+        })
+
+        if(!exisitnJob){
+            throw new Error("This job does not exist")
+        }
+
+        const deletedJob = await prisma.job.delete({
+            where:{id:jobId}
+        })
+
+        return deletedJob
+
+    }
 
 }

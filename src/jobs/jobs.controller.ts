@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Req, Res } from '@nestjs/common';
 import type { Response,Request } from 'express';
 import { JobsService } from './jobs.service';
 
@@ -17,9 +17,9 @@ export class JobsController {
         if(!userId){
             return res.status(401).json({message:"Unable to authenticate user"})
         }
-       const {title, description} = body
+       const {title, description,dependOn} = body
         try{
-            const newJob = await this.jobService.createJob(title,description,userId)
+            const newJob = await this.jobService.createJob(title,description,userId,dependOn)
             res.status(201).json({message:"Job created successfully", job:newJob})
         }catch(error){
             return res.status(500).json({message:"Failed to create job", error:error.message})
@@ -50,5 +50,12 @@ export class JobsController {
         }
         const job = await this.jobService.getJobById(jobId)
         res.status(200).json({job})
+    }
+
+    @Delete(':id')
+    async deleteJob(@Param('id') paramId:string , @Res({passthrough:true}) res:Response){
+        const jobId = parseInt(paramId)
+        const response = this.jobService.deleteJob(jobId)
+        res.status(200).json({message:"Job Deleted successfully",response})
     }
 }
