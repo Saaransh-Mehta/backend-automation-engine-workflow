@@ -1,0 +1,57 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+
+
+const prisma = new PrismaClient()
+
+@Injectable()
+export class JobsService {
+    async createJob(title:string,description:string,userId:number){
+        if(!title || !description || !userId){
+            throw new Error("Missing Required Necessary Fields")
+        }
+        const newJob = await prisma.job.create({
+            data:{
+                title,
+                description,
+                user:{
+                    connect:{id:userId}
+                }
+            }
+        })
+        return newJob
+    }
+
+    async updateJob(paramId:number,title?:string,description?:string){
+        const exisitingJob = await prisma.job.findUnique({
+            where:{id:paramId}
+
+        })
+        if(!exisitingJob){
+            throw new Error("Job not found")
+        }
+        const updatedJob = await prisma.job.update({
+            where:{id:paramId},
+            data:{
+                title: title || exisitingJob.title,
+                description: description || exisitingJob.description
+            }
+        })
+        
+        return updatedJob
+
+
+    }
+
+    async getJobById(jobId:number){
+        const job = await prisma.job.findUnique({
+            where:{id:jobId}
+        })
+        if(!job){
+            throw new Error("Job not found")
+        }
+        return job
+    }
+
+
+}

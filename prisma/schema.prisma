@@ -13,31 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User{
-  id Int @id @default(autoincrement())
-  username String @unique
-  email String @unique
-  password String
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  jobs Job[]
-  
+  jobs      Job[]
 }
 
 model Job {
-  id           Int      @id @default(autoincrement())
-  title        String
-  status       String   @default("pending")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  dependsOnId  Int?      
-  dependsOn    Job?     @relation("JobDependencies", fields: [dependsOnId], references: [id])
-  dependentJobs Job[]   @relation("JobDependencies")
-  userId       Int
-  user         User     @relation(fields: [userId], references: [id])
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  dependsOnId   Int?
+  dependsOn     Job?     @relation("JobDependencies", fields: [dependsOnId], references: [id])
+  dependentJobs Job[]    @relation("JobDependencies")
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
 }
-
 
 enum JobStatus {
   PENDING
