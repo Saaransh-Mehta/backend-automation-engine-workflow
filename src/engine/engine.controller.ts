@@ -1,4 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
+import { EngineService } from './engine.service';
 
 @Controller('engine')
-export class EngineController {}
+export class EngineController {
+    constructor(private readonly engineService:EngineService){}
+    @Get('')
+    async startEngine(){
+        return this.engineService.startEngine()
+        
+    }
+}
