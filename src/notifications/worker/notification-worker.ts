@@ -9,7 +9,15 @@ const notificationWorker = new Worker('notificationQueue',async(notification)=>{
     console.log(`Processing notification with id ${notification.id} for user ${notification.data.userId}`)
     try{
         //Simulate Notification processing
-        await sendMail(notification.data.userId,"Success job proccessing",notification.data.message)
+        const user = await prisma.user.findUnique({
+            where:{id:notification.data.userId}
+        })
+
+        if(!user){
+            throw new Error('User not found')
+        }
+
+        await sendMail(user.email,"Success job proccessing",notification.data.message)
         console.log(`Notification with id ${notification.id} processed successfully`)
     }catch(err){
         await deadLetterNotiQueue(notification.data)

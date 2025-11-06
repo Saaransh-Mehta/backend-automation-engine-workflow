@@ -9,7 +9,15 @@ const prisma = new PrismaClient()
 export const jobWorker = new Worker('jobQueue', async(job)=>{
     try{
         console.log(`Processing Job with id ${job.id}`)
-        //Simulate job processing
+        if(job.data.dependsOnId){
+            const parentJob = await prisma.job.findUnique({
+                where:{id:job.data.dependsOnId}
+            })
+            if(!parentJob || parentJob.status !== 'completed'){
+                throw new Error('Dependent job not completed yet')
+            }
+
+        }
        await processJob(job.data)
         //After processing update the job status in DB
        const updatedJob =  await prisma.job.update({

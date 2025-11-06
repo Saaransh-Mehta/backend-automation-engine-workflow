@@ -10,7 +10,7 @@ export class EngineService {
         const jobs = await prisma.job.findMany({
             where:{
                 status:"pending"
-        }
+        },take:10
     })        
     // Calling the function to add jobs in queue
     addJobsTOQueue(jobs)

@@ -7,24 +7,41 @@ const prisma = new PrismaClient()
 
 @Injectable()
 export class JobsService {
-    async createJob(title:string,description:string,userId:number,dependOn?:number){
-        if(!title || !description || !userId){
-            throw new Error("Missing Required Necessary Fields")
-        }
-        const newJob = await prisma.job.create({
-            data:{
-                title,
-                description,
-                user:{
-                    connect:{id:userId}
-                },
-                dependsOn:{
-                    connect: dependOn ? {id:dependOn} : undefined
-                }
-            }
-        })
-        return newJob
-    }
+    async createJob(
+  title: string,
+  description: string,
+  userId: number,
+  dependOn?: number
+) {
+  if (!title || !description || !userId) {
+    throw new Error("Missing Required Necessary Fields");
+  }
+
+  if (dependOn) {
+    const parentJob = await prisma.job.findUnique({
+      where: { id: dependOn },
+    });
+    if (!parentJob) throw new Error("Dependent job not found");
+  }
+
+  const newJob = await prisma.job.create({
+    data: {
+      title,
+      description,
+      user: {
+        connect: { id: userId },
+      },
+      dependsOn: dependOn
+        ? {
+            connect: { id: dependOn },
+          }
+        : undefined,
+    },
+  });
+
+  return newJob;
+}
+
 
     async updateJob(paramId:number,title?:string,description?:string){
         const exisitingJob = await prisma.job.findUnique({
