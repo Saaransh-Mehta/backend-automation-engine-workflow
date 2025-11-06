@@ -6,14 +6,15 @@ const prisma = new PrismaClient()
 
 @Injectable()
 export class EngineService {
-    async startEngine(){
-        const jobs = await prisma.job.findMany({
-            where:{
-                status:"pending"
-        },take:10
-    })        
-    // Calling the function to add jobs in queue
+    async startEngine(userId:number){
+       const jobs = await prisma.job.findMany({
+        where:{userId,status:"pending"},
+        take:10
+       })  
+    
     addJobsTOQueue(jobs)
+    
     return {message:"Engine started and jobs are being processed"}
     }
+
 }

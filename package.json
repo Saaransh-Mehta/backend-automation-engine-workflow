@@ -36,6 +36,7 @@
     "dotenv": "^17.2.3",
     "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.10",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
